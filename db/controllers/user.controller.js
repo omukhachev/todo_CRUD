@@ -1,14 +1,16 @@
 const User = require('../models/user.model');
+const sha256 = require('js-sha256');
 
-exports.user_create = async (req, res) => {
+exports.user_create = (req, res) => {
+    const passWord = sha256.update(req.body.password);
     const user = new User(
         {
             login: req.body.login,
-            password: req.body.password,
+            password: passWord,
         }
     );
     try {
-        await user.save(() => res.send('User created: ' + user._id));
+        user.save(() => res.send('User created: ' + user._id));
     }
     catch (e) {
         throw new Error(e);

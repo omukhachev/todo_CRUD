@@ -1,8 +1,10 @@
 const Item = require('../models/item.model');
 
 exports.item_create = async (req, res) => {
+    
     const item = new Item(
         {
+            id_u: req.body.id_u,
             text: req.body.text,
             key: req.body.key,
             ready: req.body.ready,
