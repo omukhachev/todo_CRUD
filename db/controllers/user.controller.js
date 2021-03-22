@@ -18,8 +18,9 @@ exports.user_create = async (req, res) => {
 exports.user_get_data = async (req, res) => {
     try {
         const data = await User.findById(req.params.id);
-        res.send(data)
-    } catch (e) {
+        res.send(data);
+    }
+    catch (e) {
         throw new Error(e);
     }
 };
@@ -39,8 +40,12 @@ exports.user_update = async (req, res) => {
 
 exports.user_delete = async (req, res) => {
     try {
-       await User.findByIdAndRemove(req.params.id, () => res.send('User deleted'));
-    } catch (e) {
+        await User.findByIdAndRemove(
+            req.params.id,
+            () => res.send('User deleted')
+        );
+    }
+    catch (e) {
         throw new Error(e);
     }
 };
