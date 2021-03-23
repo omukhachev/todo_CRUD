@@ -8,7 +8,10 @@ const mongoose = require('mongoose');
 const remote_db_url = 'mongodb+srv://user:restart987@cluster0.ql2ol.mongodb.net/database?retryWrites=true&w=majority';
 const mongoDB = process.env.MONGODB_URI || remote_db_url;
 
-mongoose.connect(mongoDB);
+mongoose.connect(mongoDB, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+});
 mongoose.Promise = global.Promise;
 mongoose.set('useFindAndModify', false);
 
