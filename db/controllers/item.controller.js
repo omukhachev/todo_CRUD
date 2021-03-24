@@ -4,7 +4,7 @@ exports.item_create = async (req, res) => {
 
     const item = new Item(
         {
-            id_u: req.body.id_u,
+            user_id: req.body.user_id,
             text: req.body.text,
             key: req.body.key,
             ready: req.body.ready,
@@ -20,7 +20,7 @@ exports.item_create = async (req, res) => {
 
 exports.item_get_data = async (req, res) => {
     try {
-        const data = await Item.find({ id_u: req.params.id_u });
+        const data = await Item.find({ user_id: req.params.user_id });
         res.send(data);
     }
     catch (e) {
