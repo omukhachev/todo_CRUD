@@ -20,20 +20,18 @@ exports.item_create = async (req, res) => {
 
 exports.item_get_data = async (req, res) => {
     try {
-        const data = await Item.find({ user_id: req.params.user_id });
-        res.send(data);
+        res.send(await Item.find({ user_id: req.params.user_id }));
     }
     catch (e) {
         throw new Error(e);
     }
 };
 
-exports.item_update = async (req, res) => {
+exports.item_update = async (req) => {
     try {
         await Item.updateOne(
             { key: req.params.key },
             { $set: req.body },
-            () => res.send('Item updated')
         );
     }
     catch (e) {
@@ -41,12 +39,11 @@ exports.item_update = async (req, res) => {
     }
 };
 
-exports.item_update_all = async (req, res) => {
+exports.item_update_all = async () => {
     try {
         await Item.updateMany(
             {},
             { ready: true },
-            () => res.send('All is checked')
         );
     }
     catch (e) {
@@ -54,11 +51,10 @@ exports.item_update_all = async (req, res) => {
     }
 }
 
-exports.item_delete = async (req, res) => {
+exports.item_delete = async (req) => {
     try {
         await Item.deleteOne(
             { key: req.params.key },
-            () => res.send('Item deleted')
         );
     }
     catch (e) {
@@ -66,11 +62,10 @@ exports.item_delete = async (req, res) => {
     }
 };
 
-exports.item_delete_checked = async (req, res) => {
+exports.item_delete_checked = async () => {
     try {
         await Item.deleteMany(
             { ready: true },
-            () => res.send('Completed items are deleted')
         );
     }
     catch (e) {
