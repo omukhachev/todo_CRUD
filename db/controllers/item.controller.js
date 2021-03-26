@@ -11,7 +11,7 @@ exports.item_create = async (req, res) => {
         }
     );
     try {
-        await item.save(() => res.send('Item created: ' + item._id));
+        await item.save(() => res.send(item));
     }
     catch (e) {
         throw new Error(e);
@@ -27,46 +27,67 @@ exports.item_get_data = async (req, res) => {
     }
 };
 
-exports.item_update = async (req) => {
+exports.item_update = async (req, res) => {
     try {
         await Item.updateOne(
-            { key: req.params.key },
+            {
+                user_id: req.params.user_id,
+                key: req.params.key,
+            },
             { $set: req.body },
         );
+        res.send(await Item.find({
+            user_id: req.params.user_id,
+        }));
     }
     catch (e) {
         throw new Error(e);
     }
 };
 
-exports.item_update_all = async () => {
+exports.item_update_all = async (req, res) => {
     try {
         await Item.updateMany(
-            {},
+            { user_id: req.params.user_id },
             { ready: true },
         );
+        res.send(await Item.find({
+            user_id: req.params.user_id,
+        }));
     }
     catch (e) {
         throw new Error(e);
     }
 }
 
-exports.item_delete = async (req) => {
+exports.item_delete = async (req, res) => {
     try {
         await Item.deleteOne(
-            { key: req.params.key },
+            {
+                user_id: req.params.user_id,
+                key: req.params.key
+            },
         );
+        res.send(await Item.find({
+            user_id: req.params.user_id,
+        }));
     }
     catch (e) {
         throw new Error(e);
     }
 };
 
-exports.item_delete_checked = async () => {
+exports.item_delete_checked = async (req, res) => {
     try {
         await Item.deleteMany(
-            { ready: true },
+            {
+                user_id: req.params.user_id,
+                ready: true
+            },
         );
+        res.send(await Item.find({
+            user_id: req.params.user_id,
+        }));
     }
     catch (e) {
         throw new Error(e);
