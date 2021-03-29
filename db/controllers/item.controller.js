@@ -7,7 +7,7 @@ exports.item_create = async (req, res) => {
             user_id: req.body.user_id,
             text: req.body.text,
             key: req.body.key,
-            ready: req.body.ready,
+            isChecked: req.body.isChecked,
         }
     );
     try {
@@ -49,7 +49,7 @@ exports.item_update_all = async (req, res) => {
     try {
         await Item.updateMany(
             { user_id: req.params.user_id },
-            { ready: true },
+            { isChecked: true },
         );
         res.send(await Item.find({
             user_id: req.params.user_id,
@@ -82,7 +82,7 @@ exports.item_delete_checked = async (req, res) => {
         await Item.deleteMany(
             {
                 user_id: req.params.user_id,
-                ready: true
+                isChecked: true
             },
         );
         res.send(await Item.find({
