@@ -1,16 +1,22 @@
 const User = require('../models/user.model');
-const sha256 = require('js-sha256');
+const crypto = require('crypto');
 
-exports.user_create = (req, res) => {
-    const passWord = sha256.update(req.body.password);
+const hash = crypto.createHmac('sha256','restart987');
+
+exports.user_create = async (req, res) => {
     const user = new User(
         {
             login: req.body.login,
-            password: passWord,
+            password: hash.update(req.body.password).digest('base64'),
         }
     );
     try {
-        user.save(() => res.send('User created: ' + user._id));
+        const response = await User.find();
+        const currentUserExist = response.map((item) => {
+            return item.login
+        }).filter(item => item === req.body.login);
+        !currentUserExist[0] ? await user.save(() => res.send({response: 'User created!'})) : res.send({response:'User already exists!'});
+        
     }
     catch (e) {
         throw new Error(e);
