@@ -1,9 +1,8 @@
 const User = require('../models/user.model');
 const crypto = require('crypto');
 
-const hash = crypto.createHmac('sha256','restart987');
-
 exports.user_create = async (req, res) => {
+    const hash = crypto.createHmac('sha256', 'restart987');
     const user = new User(
         {
             login: req.body.login,
@@ -15,8 +14,8 @@ exports.user_create = async (req, res) => {
         const currentUserExist = response.map((item) => {
             return item.login
         }).filter(item => item === req.body.login);
-        !currentUserExist[0] ? await user.save(() => res.send({response: 'User created!'})) : res.send({response:'User already exists!'});
-        
+        !currentUserExist[0] ? await user.save(() => res.send({ response: 'User created!' })) : res.send({ response: 'User already exists!' });
+
     }
     catch (e) {
         throw new Error(e);
@@ -57,3 +56,26 @@ exports.user_delete = async (req, res) => {
         throw new Error(e);
     }
 };
+
+exports.user_auth = async (req, res) => {
+    const hash = crypto.createHmac('sha256', 'restart987');
+    try {
+        const response = await User.find();
+        res.send(
+            !!response.filter(
+                item => item.login === req.body.login && item.password === hash.update(req.body.password).digest('base64')
+            ).length
+                ?
+                {
+                    auth: true,
+                }
+                :
+                { 
+                    auth: false, 
+                }
+        );
+    }
+    catch (e) {
+        throw new Error(e);
+    }
+}
