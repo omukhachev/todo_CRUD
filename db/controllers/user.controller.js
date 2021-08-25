@@ -1,5 +1,7 @@
 const User = require('../models/user.model');
 const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
+
 
 exports.user_create = async (req, res) => {
     const hash = crypto.createHmac('sha256', 'restart987');
@@ -14,7 +16,7 @@ exports.user_create = async (req, res) => {
         const currentUserExist = response.map((item) => {
             return item.login
         }).filter(item => item === req.body.login);
-        !currentUserExist[0] ? await user.save(() => res.send({ response: 'User created!' })) : res.send({ response: 'User already exists!' });
+        !currentUserExist[0] ? await user.save(() => res.send({ response: 'User created!' })) : res.send({ error: 'User already exists!' });
 
     }
     catch (e) {
@@ -24,7 +26,8 @@ exports.user_create = async (req, res) => {
 
 exports.user_get_data = async (req, res) => {
     try {
-        const data = await User.findById(req.params.id);
+        const uid = jwt.verify(req.body.token, 'privateKey').id;
+        const data = await User.findById(uid);
         res.send(data);
     }
     catch (e) {
@@ -60,20 +63,29 @@ exports.user_delete = async (req, res) => {
 exports.user_auth = async (req, res) => {
     const hash = crypto.createHmac('sha256', 'restart987');
     try {
-        const response = await User.find();
-        res.send(
-            !!response.filter(
-                item => item.login === req.body.login && item.password === hash.update(req.body.password).digest('base64')
-            ).length
-                ?
-                {
-                    auth: true,
-                }
-                :
-                { 
-                    auth: false, 
-                }
-        );
+        const response = await User.findOne({login: req.body.login});
+        if (!response) {
+            res.send({
+                success: false,
+                error: 'User not found',
+            });
+            return;
+        } else {
+            const password = hash.update(req.body.password).digest('base64') === response.password;
+            if (!password) {
+                res.send({
+                    success: false,
+                    error: 'Incorrect password',
+                })
+                console.log(hash.update(req.body.password), ':', response.password);
+                return;
+            }
+        }
+        const token = jwt.sign({id: response._id}, 'privateKey')
+        res.send({
+            success: true,
+            token: token,
+        });
     }
     catch (e) {
         throw new Error(e);
